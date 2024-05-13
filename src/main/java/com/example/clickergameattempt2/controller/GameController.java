@@ -1,14 +1,15 @@
-package com.example.clickergameattempt2;
+package com.example.clickergameattempt2.controller;
 
 import com.example.clickergameattempt2.model.Droplet;
+import com.example.clickergameattempt2.model.Rocket;
+import com.example.clickergameattempt2.util.RandomUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
-import java.util.Random;
 
-public class HelloController {
+public class GameController {
 
     @FXML
     private Pane gamePane;
@@ -20,11 +21,9 @@ public class HelloController {
     private int score = 0;
     private int explosionUpgradeLevel = 1;
     private int rainCollectorUpgradeLevel = 0;
-    private Random random = new Random();
 
     @FXML
     public void initialize() {
-        // Initial setup
         updateScoreText();
         upgradeButton.setOnAction(e -> showUpgradeMenu());
     }
@@ -36,8 +35,8 @@ public class HelloController {
     public void spawnDroplets(double x, double y) {
         int dropletCount = 10 * explosionUpgradeLevel;
         for (int i = 0; i < dropletCount; i++) {
-            double dropletX = random.nextDouble() * gamePane.getWidth();
-            double dropletY = y + random.nextDouble() * 50; // Slightly below the explosion point
+            double dropletX = RandomUtil.randomDouble(0, gamePane.getWidth());
+            double dropletY = y + RandomUtil.randomDouble(0, 50);
 
             Droplet droplet = new Droplet(dropletX, dropletY);
             droplet.setOnMouseClicked(this::collectDroplet);
@@ -74,5 +73,12 @@ public class HelloController {
         int collected = droplets * rainCollectorUpgradeLevel / 100;
         score += collected;
         updateScoreText();
+    }
+
+    public void spawnRocket() {
+        Rocket rocket = new Rocket(gamePane.getWidth() / 2, gamePane.getHeight());
+        rocket.setOnExplosion(this::spawnDroplets);
+        gamePane.getChildren().add(rocket);
+        rocket.launch();
     }
 }
